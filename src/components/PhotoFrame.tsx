@@ -8,11 +8,10 @@ function PhotoImage({ imageUrl }: { imageUrl: string }) {
   const meshRef = useRef<THREE.Mesh>(null)
   const timeRef = useRef(0)
   
-  useFrame((state) => {
+  useFrame(() => {
     if (meshRef.current) {
       timeRef.current += 0.02
       const material = meshRef.current.material as THREE.MeshStandardMaterial
-      // Tạo hiệu ứng shimmer với emissive intensity thay đổi
       const shimmer = Math.sin(timeRef.current) * 0.15 + 0.25
       material.emissiveIntensity = shimmer
     }
@@ -151,7 +150,7 @@ class PhotoErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBounda
     return { hasError: true }
   }
 
-  componentDidCatch(error: Error) {
+  componentDidCatch() {
     console.log('Photo loading. Please add image.jpg to public folder.')
   }
 
