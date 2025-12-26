@@ -6,8 +6,6 @@ import FloatingElements from './components/FloatingElements'
 import { useGraduationData } from './hooks/useGraduationData'
 
 function HeroSection() {
-  const data = useGraduationData()
-  
   return (
     <section className="min-h-screen flex items-center justify-center relative py-20">
       <Background />
@@ -18,6 +16,7 @@ function HeroSection() {
     </section>
   )
 }
+
 
 function LandingPage() {
   const data = useGraduationData()
