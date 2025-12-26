@@ -1,111 +1,61 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  overflow: hidden;
-}
-
-.app-container {
-  width: 100vw;
-  height: 100vh;
-  position: relative;
-  background: radial-gradient(ellipse at top, #ffeef7 0%, #ffc1e3 25%, #ff8cc8 50%, #ff69b4 75%, #e91e63 100%);
-  background-size: 100% 200%;
-  animation: gradientShift 25s ease infinite;
-  overflow: hidden;
-}
-
-.app-container::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-image: 
-    radial-gradient(2px 2px at 20% 30%, rgba(255, 255, 255, 0.8), transparent),
-    radial-gradient(2px 2px at 60% 70%, rgba(255, 255, 255, 0.6), transparent),
-    radial-gradient(1px 1px at 50% 50%, rgba(255, 255, 255, 0.9), transparent),
-    radial-gradient(1px 1px at 80% 10%, rgba(255, 255, 255, 0.7), transparent),
-    radial-gradient(2px 2px at 90% 40%, rgba(255, 255, 255, 0.8), transparent),
-    radial-gradient(1px 1px at 33% 60%, rgba(255, 255, 255, 0.6), transparent),
-    radial-gradient(1px 1px at 55% 25%, rgba(255, 255, 255, 0.7), transparent),
-    radial-gradient(2px 2px at 75% 80%, rgba(255, 255, 255, 0.8), transparent);
-  background-size: 200% 200%;
-  background-position: 0% 0%;
-  animation: starsMove 60s linear infinite;
-  opacity: 0.6;
-  pointer-events: none;
-}
-
-@keyframes gradientShift {
-  0% {
-    background-position: 0% 0%;
+@layer base {
+  body {
+    @apply bg-luxury-black text-luxury-white font-sans antialiased;
+    overflow-x: hidden;
   }
-  50% {
-    background-position: 0% 100%;
-  }
-  100% {
-    background-position: 0% 0%;
+  
+  * {
+    @apply scroll-smooth;
   }
 }
 
-@keyframes starsMove {
-  0% {
-    background-position: 0% 0%;
+@layer components {
+  .gradient-gold {
+    background: linear-gradient(135deg, #d4af37 0%, #ffd700 50%, #ffed4e 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
-  100% {
-    background-position: 100% 100%;
+  
+  .card-shadow {
+    box-shadow: 
+      0 25px 80px rgba(0, 0, 0, 0.5),
+      0 0 60px rgba(212, 175, 55, 0.2),
+      inset 0 0 100px rgba(255, 255, 255, 0.1);
   }
-}
-
-.audio-control {
-  position: fixed;
-  bottom: 30px;
-  right: 30px;
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  border: 2px solid rgba(233, 30, 99, 0.8);
-  background: rgba(255, 255, 255, 0.95);
-  color: #e91e63;
-  font-size: 24px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.3s ease;
-  backdrop-filter: blur(10px);
-  z-index: 1000;
-  box-shadow: 0 4px 20px rgba(233, 30, 99, 0.3);
-}
-
-.audio-control:hover {
-  background: rgba(255, 255, 255, 1);
-  border-color: #e91e63;
-  transform: scale(1.1);
-  box-shadow: 0 6px 30px rgba(233, 30, 99, 0.5);
-}
-
-.audio-control:active {
-  transform: scale(0.95);
-}
-
-@media (max-width: 768px) {
-  .audio-control {
-    width: 50px;
-    height: 50px;
-    font-size: 20px;
-    bottom: 20px;
-    right: 20px;
+  
+  .gold-glow {
+    box-shadow: 
+      0 0 30px rgba(212, 175, 55, 0.5),
+      0 0 60px rgba(212, 175, 55, 0.3);
+  }
+  
+  .blur-background {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+  
+  @keyframes shimmer {
+    0% {
+      background-position: -1000px 0;
+    }
+    100% {
+      background-position: 1000px 0;
+    }
+  }
+  
+  .shimmer {
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.2) 50%,
+      transparent 100%
+    );
+    background-size: 1000px 100%;
+    animation: shimmer 3s infinite;
   }
 }

@@ -1,26 +1,28 @@
-# Thư Mời Lễ Tốt Nghiệp 3D - Thiệp Cưới Style
+# Thư Mời Lễ Tốt Nghiệp - Graduation Invitation
 
-Thư mời lễ tốt nghiệp 3D được thiết kế theo phong cách thiệp cưới sang trọng với hiệu ứng mở thư và hiển thị ảnh.
+Thư mời lễ tốt nghiệp sang trọng được thiết kế với React, TailwindCSS và Framer Motion.
 
 ## ✨ Tính Năng
 
-- 🎴 **Hiệu ứng mở thư 3D** - Animation mở thư tự động
-- 📸 **Hiển thị ảnh** - Ảnh cá nhân được đóng khung vàng kim
-- 🎨 **Thiết kế thiệp cưới** - Phong cách sang trọng, màu vàng kim, hồng pastel
-- ✨ **Background gradient** - Nền màu pastel nhẹ nhàng
-- 🌟 **Particles vàng kim** - Hạt sáng trang trí
-- 🎭 **Postprocessing effects**: Bloom effect
+- 🎴 **Thiết kế sang trọng** - Phong cách luxury với màu đen, vàng ánh kim, trắng
+- 📸 **Ảnh cá nhân** - Hiển thị ảnh sinh viên với border vàng kim
+- ✨ **Animations mượt mà** - Framer Motion với fade-in, scale, stagger effects
+- 🎉 **Confetti effect** - Hiệu ứng confetti khi xác nhận tham dự
+- 📅 **Google Calendar** - Button để lưu sự kiện vào Google Calendar
+- 📱 **Responsive 100%** - Tối ưu cho mobile, tablet, desktop
+- 🌟 **Background đẹp mắt** - Ảnh nền blur với particles vàng ánh kim
 
-## 🚀 Cài Đặt
+## 🚀 Cài Đặt & Chạy
 
 ```bash
+# Cài đặt dependencies
 npm install
-```
 
-## 🎯 Chạy Dự Án
-
-```bash
+# Chạy development server
 npm run dev
+
+# Build cho production
+npm run build
 ```
 
 Ứng dụng sẽ chạy tại `http://localhost:3000`
@@ -28,9 +30,9 @@ npm run dev
 ## 📸 Thêm Ảnh Của Bạn
 
 1. Đặt ảnh của bạn vào thư mục `public/`
-2. Đổi tên file thành `image.jpg` (hoặc cập nhật đường dẫn trong `src/components/Letter.tsx`)
+2. Đổi tên file thành `image.jpg`
 
-**Lưu ý**: Ảnh nên là ảnh chân dung, tỷ lệ khoảng 2:3 (rộng:cao) để hiển thị đẹp nhất.
+**Lưu ý**: Ảnh nên là ảnh chân dung, tỷ lệ khoảng 1:1 (hình vuông) để hiển thị đẹp nhất với border-radius tròn.
 
 ## 🎨 Tùy Chỉnh Nội Dung
 
@@ -40,7 +42,7 @@ Chỉnh sửa thông tin trong file `src/hooks/useGraduationData.ts`:
 export function useGraduationData(): GraduationData {
   return {
     studentName: "Tên của bạn",
-    major: "Ngành học",
+    major: "Ngành học - Tên trường",
     date: "Ngày tháng",
     time: "Giờ",
     location: "Địa điểm"
@@ -48,59 +50,46 @@ export function useGraduationData(): GraduationData {
 }
 ```
 
-## 🎵 Thêm Nhạc Nền
-
-1. Đặt file nhạc vào thư mục `public/audio/`
-2. Cập nhật đường dẫn trong `src/components/AudioControl.tsx`:
-
-```typescript
-audioRef.current.src = '/audio/background-music.mp3'
-```
-
 ## 🛠️ Công Nghệ Sử Dụng
 
 - **React 18** - UI Framework
-- **Three.js** - 3D Graphics Library
-- **@react-three/fiber** - React renderer cho Three.js
-- **@react-three/drei** - Helpers và utilities
-- **@react-three/postprocessing** - Post-processing effects
+- **React Router** - Routing
+- **TailwindCSS** - Styling
+- **Framer Motion** - Animations
+- **TypeScript** - Type safety
 - **Vite** - Build tool
 
-## 📝 Cấu Trúc Dự Án
+## 📦 Cấu Trúc Dự Án
 
 ```
 src/
 ├── components/
-│   ├── Letter.tsx            # Component thiệp 3D chính với ảnh
-│   ├── Particles.tsx         # Hệ thống particles
-│   └── AudioControl.tsx      # Điều khiển nhạc
+│   ├── Background.tsx       # Background với ảnh blur và particles
+│   └── GraduationCard.tsx   # Component thiệp mời chính
 ├── hooks/
-│   └── useGraduationData.ts  # Hook quản lý dữ liệu
-├── App.tsx                    # Component chính
-├── main.tsx                   # Entry point
-└── styles.css                 # Styling
-public/
-└── image.jpg                  # Ảnh của bạn (cần thêm vào)
+│   └── useGraduationData.ts # Hook quản lý dữ liệu
+├── App.tsx                   # Component chính với routing
+├── main.tsx                  # Entry point
+└── styles.css                # Global styles với TailwindCSS
 ```
 
 ## 🎨 Màu Sắc & Thiết Kế
 
-- **Vàng kim (#d4af37)** - Màu chủ đạo, sang trọng
-- **Hồng pastel (#ffeef5, #fff8f0)** - Background nhẹ nhàng
-- **Trắng kem (#fffaf0)** - Màu nền thiệp
-- **Hồng nhạt (#ffb6c1)** - Trang trí
+- **Đen (#1a1a1a)** - Màu nền chính
+- **Vàng ánh kim (#d4af37, #ffd700)** - Màu chủ đạo, sang trọng
+- **Trắng (#fafafa)** - Màu nền thiệp
+- **Font serif** - Playfair Display, Cinzel cho tiêu đề
+- **Font sans-serif** - Inter, Poppins cho nội dung
 
-## 🔧 Tối Ưu Hiệu Suất
+## 🌐 Deploy
 
-- Sử dụng `useFrame` với GPU-accelerated animations
-- Particles giảm xuống 300 để tối ưu
-- Frustum culling cho particles
-- DPR scaling tự động
+### Deploy lên Netlify
 
-## 📱 Responsive
+1. Build project: `npm run build`
+2. Deploy thư mục `dist` lên Netlify
 
-Thiết kế responsive, hoạt động tốt trên mọi thiết bị từ desktop đến mobile.
+File `netlify.toml` đã được cấu hình sẵn với MIME types và redirect rules.
 
-## 🎓 License
+## 📝 License
 
 MIT
