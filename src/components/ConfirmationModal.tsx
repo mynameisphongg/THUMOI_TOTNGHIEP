@@ -1,5 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion'
-import { useState } from 'react'
+import { useState, useCallback, useMemo } from 'react'
+import { saveToGoogleSheets } from '../utils/saveToGoogleSheets'
 
 interface ConfirmationModalProps {
   isOpen: boolean
@@ -16,12 +17,49 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm }: ConfirmationModalProp
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const phoneRegex = useMemo(() => /^[0-9]{10,11}$/, [])
+
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault()
+    setError(null)
+    
+    // Validate required fields
+    if (!formData.name.trim()) {
+      setError('Vui lòng nhập họ và tên')
+      return
+    }
+    
+    if (!formData.phone.trim()) {
+      setError('Vui lòng nhập số điện thoại')
+      return
+    }
+
+    // Validate phone number format (10-11 digits)
+    if (!phoneRegex.test(formData.phone.replace(/\s/g, ''))) {
+      setError('Số điện thoại không hợp lệ. Vui lòng nhập 10-11 chữ số')
+      return
+    }
+
     setIsSubmitting(true)
     
-    setTimeout(() => {
+    try {
+      // Save to Google Sheets
+      const result = await saveToGoogleSheets({
+        name: formData.name.trim(),
+        phone: formData.phone.trim(),
+        guests: formData.guests,
+        message: formData.message.trim(),
+      })
+
+      if (!result.success) {
+        setError(result.error || 'Không thể lưu dữ liệu. Vui lòng thử lại.')
+        setIsSubmitting(false)
+        return
+      }
+
+      // Success - show success message
       setIsSubmitting(false)
       setIsSuccess(true)
       onConfirm(formData)
@@ -30,16 +68,22 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm }: ConfirmationModalProp
         setIsSuccess(false)
         onClose()
         setFormData({ name: '', phone: '', guests: 1, message: '' })
+        setError(null)
       }, 2500)
-    }, 1200)
-  }
+    } catch (err) {
+      console.error('Error in handleSubmit:', err)
+      setError('Có lỗi xảy ra. Vui lòng thử lại.')
+      setIsSubmitting(false)
+    }
+  }, [formData, phoneRegex, onConfirm, onClose])
 
   return (
     <AnimatePresence>
       {isOpen && (
         <>
           <motion.div
-            className="fixed inset-0 bg-black/70 backdrop-blur-md z-50"
+            className="fixed inset-0 bg-black/70 z-50"
+            style={{ backdropFilter: 'blur(4px)', WebkitBackdropFilter: 'blur(4px)' }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -56,7 +100,7 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm }: ConfirmationModalProp
             <motion.div
               className="relative bg-gradient-to-br from-rose-50 via-pink-50 to-amber-50 rounded-[2.5rem] max-w-4xl w-full shadow-2xl overflow-hidden"
               style={{
-                boxShadow: '0 30px 100px rgba(0, 0, 0, 0.4), 0 0 80px rgba(212, 175, 55, 0.3)',
+                boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3), 0 0 40px rgba(212, 175, 55, 0.2)',
                 background: 'linear-gradient(135deg, #fff1f2 0%, #fef3c7 25%, #fff1f2 50%, #fef3c7 75%, #fff1f2 100%)',
               }}
               initial={{ scale: 0.9, y: 50, opacity: 0 }}
@@ -106,10 +150,10 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm }: ConfirmationModalProp
                       <div className="absolute inset-0 bg-rose-400 rounded-full blur-2xl opacity-50" />
                       <div className="relative text-7xl">✅</div>
                     </motion.div>
-                    <h3 className="text-3xl font-serif font-bold text-rose-900 mb-3">
+                    <h3 className="text-2xl md:text-3xl font-serif font-bold text-rose-900 mb-3">
                       Xác nhận thành công!
                     </h3>
-                    <p className="text-rose-700 leading-relaxed text-lg">
+                    <p className="text-rose-700 leading-relaxed text-base md:text-lg font-sans">
                       Chúng tôi rất vui được đón tiếp bạn<br />
                       tại buổi lễ tốt nghiệp.
                     </p>
@@ -127,24 +171,34 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm }: ConfirmationModalProp
                             <span className="text-2xl">🎓</span>
                           </div>
                           <div>
-                            <h2 className="text-3xl font-serif font-bold text-rose-900">
+                            <h2 className="text-2xl md:text-3xl font-serif font-bold text-rose-900">
                               Xác nhận tham dự
                             </h2>
-                            <p className="text-rose-700 text-sm mt-1">Vui lòng điền thông tin</p>
+                            <p className="text-rose-700 text-sm mt-1 font-sans">Vui lòng điền thông tin</p>
                           </div>
                         </div>
 
                         <div className="space-y-5">
+                          {error && (
+                            <div className="bg-red-50 border-2 border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm">
+                              {error}
+                            </div>
+                          )}
+                          
                           <div>
-                            <label className="block text-sm font-bold text-rose-800 mb-2">
+                            <label className="block text-sm font-semibold text-rose-800 mb-2 font-sans">
                               Họ và tên <span className="text-red-500">*</span>
                             </label>
                             <input
                               type="text"
                               required
                               value={formData.name}
-                              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                              className="w-full px-4 py-3 border-2 border-rose-200 rounded-xl focus:border-rose-400 focus:outline-none focus:ring-2 focus:ring-rose-200 transition-all text-gray-900 placeholder-gray-400 bg-white/80 backdrop-blur-sm text-base"
+                              onChange={(e) => {
+                                const value = e.target.value
+                                setFormData(prev => ({ ...prev, name: value }))
+                                if (error) setError(null)
+                              }}
+                              className="w-full px-4 py-3 border-2 border-rose-200 rounded-xl focus:border-rose-400 focus:outline-none focus:ring-2 focus:ring-rose-200 transition-all text-gray-900 placeholder-gray-400 bg-white/90 text-base font-sans"
                               placeholder="Nhập họ và tên"
                             />
                           </div>
@@ -157,8 +211,12 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm }: ConfirmationModalProp
                               type="tel"
                               required
                               value={formData.phone}
-                              onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                              className="w-full px-4 py-3 border-2 border-rose-200 rounded-xl focus:border-rose-400 focus:outline-none focus:ring-2 focus:ring-rose-200 transition-all text-gray-900 placeholder-gray-400 bg-white/80 backdrop-blur-sm text-base"
+                              onChange={(e) => {
+                                const value = e.target.value
+                                setFormData(prev => ({ ...prev, phone: value }))
+                                if (error) setError(null)
+                              }}
+                              className="w-full px-4 py-3 border-2 border-rose-200 rounded-xl focus:border-rose-400 focus:outline-none focus:ring-2 focus:ring-rose-200 transition-all text-gray-900 placeholder-gray-400 bg-white/90 text-base font-sans"
                               placeholder="0912345678"
                               pattern="[0-9]{10,11}"
                             />
@@ -173,7 +231,7 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm }: ConfirmationModalProp
                               min="1"
                               max="10"
                               value={formData.guests}
-                              onChange={(e) => setFormData({ ...formData, guests: parseInt(e.target.value) || 1 })}
+                              onChange={(e) => setFormData(prev => ({ ...prev, guests: parseInt(e.target.value) || 1 }))}
                               className="w-full px-4 py-3 border-2 border-rose-200 rounded-xl focus:border-rose-400 focus:outline-none focus:ring-2 focus:ring-rose-200 transition-all text-gray-900 bg-white/80 backdrop-blur-sm text-base"
                             />
                           </div>
@@ -194,9 +252,9 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm }: ConfirmationModalProp
                           </label>
                           <textarea
                             value={formData.message}
-                            onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                            onChange={(e) => setFormData(prev => ({ ...prev, message: e.target.value }))}
                             rows={6}
-                            className="w-full px-4 py-3 border-2 border-rose-200 rounded-xl focus:border-rose-400 focus:outline-none focus:ring-2 focus:ring-rose-200 transition-all resize-none text-gray-900 placeholder-gray-400 bg-white/80 backdrop-blur-sm text-base"
+                            className="w-full px-4 py-3 border-2 border-rose-200 rounded-xl focus:border-rose-400 focus:outline-none focus:ring-2 focus:ring-rose-200 transition-all resize-none text-gray-900 placeholder-gray-400 bg-white/90 text-base font-sans"
                             placeholder="Gửi lời chúc mừng đến sinh viên..."
                           />
                         </div>

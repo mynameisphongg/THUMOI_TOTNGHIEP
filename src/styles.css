@@ -3,13 +3,26 @@
 @tailwind utilities;
 
 @layer base {
+  * {
+    @apply scroll-smooth;
+  }
+  
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+  
   body {
     @apply bg-luxury-black text-luxury-white font-sans antialiased;
     overflow-x: hidden;
+    font-feature-settings: "kern" 1, "liga" 1;
   }
   
-  * {
-    @apply scroll-smooth;
+  /* Tối ưu font rendering */
+  h1, h2, h3, h4, h5, h6 {
+    font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
+    text-rendering: optimizeLegibility;
   }
 }
 

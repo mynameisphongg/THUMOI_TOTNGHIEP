@@ -10,6 +10,10 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     assetsDir: 'assets'
+  },
+  optimizeDeps: {
+    include: ['qrcode.react', 'framer-motion'],
+    force: true
   }
 })
 

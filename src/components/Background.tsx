@@ -6,7 +6,8 @@ const Background = () => {
   const [floatingElements, setFloatingElements] = useState<Array<{ id: number; x: number; y: number; size: number; delay: number }>>([])
 
   useEffect(() => {
-    const newParticles = Array.from({ length: 100 }, () => ({
+    // Giảm particles từ 100 xuống 50 để tối ưu hiệu suất
+    const newParticles = Array.from({ length: 50 }, () => ({
       x: Math.random() * 100,
       y: Math.random() * 100,
       delay: Math.random() * 5,
@@ -14,7 +15,8 @@ const Background = () => {
     }))
     setParticles(newParticles)
 
-    const elements = Array.from({ length: 15 }, (_, i) => ({
+    // Giảm floating elements từ 15 xuống 8
+    const elements = Array.from({ length: 8 }, (_, i) => ({
       id: i,
       x: Math.random() * 100,
       y: Math.random() * 100,
@@ -69,6 +71,9 @@ const Background = () => {
             delay: element.delay,
             ease: 'easeInOut',
           }}
+          style={{
+            willChange: 'transform',
+          }}
         />
       ))}
       
@@ -108,6 +113,9 @@ const Background = () => {
             repeat: Infinity,
             delay: particle.delay,
             ease: 'easeInOut',
+          }}
+          style={{
+            willChange: 'transform, opacity',
           }}
         />
       ))}

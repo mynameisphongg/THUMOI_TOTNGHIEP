@@ -6,7 +6,8 @@ const FloatingElements = () => {
 
   useEffect(() => {
     const icons = ['🎓', '✨', '🌟', '⭐', '💫', '🎉', '🏆']
-    const newElements = Array.from({ length: 20 }, (_, i) => ({
+    // Giảm từ 20 xuống 12 để tối ưu hiệu suất
+    const newElements = Array.from({ length: 12 }, (_, i) => ({
       id: i,
       x: Math.random() * 100,
       y: Math.random() * 100,
@@ -27,6 +28,7 @@ const FloatingElements = () => {
             left: `${element.x}%`,
             top: `${element.y}%`,
             fontSize: `${element.size}px`,
+            willChange: 'transform',
           }}
           animate={{
             y: [0, -50, 0],
@@ -50,5 +52,10 @@ const FloatingElements = () => {
 }
 
 export default FloatingElements
+
+
+
+
+
 
 

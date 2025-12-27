@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion'
 import { useState, useEffect } from 'react'
+import { QRCodeSVG } from 'qrcode.react'
 import { useGraduationData } from '../hooks/useGraduationData'
 import ConfirmationModal from './ConfirmationModal'
 
@@ -39,7 +40,8 @@ const Confetti = () => {
 
   useEffect(() => {
     const colors = ['#d4af37', '#ffd700', '#ffed4e', '#fff59d', '#ffc107']
-    const pieces = Array.from({ length: 80 }, (_, i) => ({
+    // Giảm từ 80 xuống 35 để tối ưu hiệu suất
+    const pieces = Array.from({ length: 35 }, (_, i) => ({
       id: i,
       x: Math.random() * 100,
       delay: Math.random() * 2,
@@ -52,7 +54,7 @@ const Confetti = () => {
   }, [])
 
   return (
-    <div className="fixed inset-0 pointer-events-none z-50 overflow-hidden">
+    <div className="fixed inset-0 pointer-events-none z-50 overflow-hidden" style={{ willChange: 'transform' }}>
       {confettiPieces.map((piece) => (
         <motion.div
           key={piece.id}
@@ -61,6 +63,7 @@ const Confetti = () => {
             left: `${piece.x}%`,
             backgroundColor: piece.color,
             boxShadow: `0 0 8px ${piece.color}`,
+            willChange: 'transform',
           }}
           initial={{ y: -10, opacity: 0, rotate: 0, x: 0 }}
           animate={{
@@ -157,12 +160,12 @@ const GraduationCard = () => {
                 variants={itemVariants}
               >
                 <p className="text-xs sm:text-sm font-sans font-semibold text-gold-700 tracking-widest uppercase">
-                  Thư Mời
+                  THƯ MỜI
                 </p>
               </motion.div>
               
               <motion.h1
-                className="text-4xl sm:text-5xl md:text-6xl font-serif font-bold mb-6"
+                className="text-3xl sm:text-4xl md:text-5xl font-serif font-bold mb-6"
                 style={{
                   background: 'linear-gradient(135deg, #1a1a1a 0%, #d4af37 50%, #1a1a1a 100%)',
                   WebkitBackgroundClip: 'text',
@@ -201,13 +204,13 @@ const GraduationCard = () => {
               
               <motion.div className="text-center md:text-left flex-1" variants={itemVariants}>
                 <motion.p 
-                  className="text-lg sm:text-xl md:text-2xl font-sans mb-3 text-gray-600"
+                  className="text-base sm:text-lg md:text-xl font-sans mb-3 text-gray-600 font-normal"
                   variants={itemVariants}
                 >
                   Trân trọng kính mời
                 </motion.p>
                 <motion.h2 
-                  className="text-3xl sm:text-4xl md:text-5xl font-serif font-bold mb-3"
+                  className="text-2xl sm:text-3xl md:text-4xl font-serif font-bold mb-3"
                   style={{
                     background: 'linear-gradient(135deg, #d4af37 0%, #ffd700 50%, #ffed4e 100%)',
                     WebkitBackgroundClip: 'text',
@@ -219,7 +222,7 @@ const GraduationCard = () => {
                   {data.studentName}
                 </motion.h2>
                 <motion.p 
-                  className="text-base sm:text-lg md:text-xl font-sans text-gray-700 font-medium"
+                  className="text-sm sm:text-base md:text-lg font-sans text-gray-700 font-normal"
                   variants={itemVariants}
                 >
                   {data.major}
@@ -239,9 +242,9 @@ const GraduationCard = () => {
                 >
                   <div className="flex flex-col items-center text-center">
                     <div className="text-4xl mb-3">📅</div>
-                    <p className="font-sans text-xs text-gray-500 uppercase tracking-wider mb-2">Ngày</p>
-                    <p className="font-serif text-lg font-bold text-gray-800">{data.date.split(',')[0]}</p>
-                    <p className="font-serif text-base text-gray-700">{data.date.split(',')[1]}</p>
+                    <p className="font-sans text-xs text-gray-500 uppercase tracking-wider mb-2 font-medium">Ngày</p>
+                    <p className="font-serif text-base font-bold text-gray-800">{data.date.split(',')[0]}</p>
+                    <p className="font-serif text-sm text-gray-700 font-normal">{data.date.split(',')[1]}</p>
                   </div>
                 </motion.div>
                 
@@ -252,8 +255,8 @@ const GraduationCard = () => {
                 >
                   <div className="flex flex-col items-center text-center">
                     <div className="text-4xl mb-3">🕐</div>
-                    <p className="font-sans text-xs text-gray-500 uppercase tracking-wider mb-2">Thời gian</p>
-                    <p className="font-serif text-2xl font-bold text-gray-800">{data.time}</p>
+                    <p className="font-sans text-xs text-gray-500 uppercase tracking-wider mb-2 font-medium">Thời gian</p>
+                    <p className="font-serif text-xl font-bold text-gray-800">{data.time}</p>
                   </div>
                 </motion.div>
                 
@@ -263,9 +266,23 @@ const GraduationCard = () => {
                   variants={itemVariants}
                 >
                   <div className="flex flex-col items-center text-center">
-                    <div className="text-4xl mb-3">📍</div>
-                    <p className="font-sans text-xs text-gray-500 uppercase tracking-wider mb-2">Địa điểm</p>
-                    <p className="font-serif text-base font-bold text-gray-800">{data.location}</p>
+                    <div className="mb-3 flex items-center justify-center">
+                      <svg 
+                        width="48" 
+                        height="48" 
+                        viewBox="0 0 24 24" 
+                        fill="none" 
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="drop-shadow-sm"
+                      >
+                        <path 
+                          d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" 
+                          fill="#EA4335"
+                        />
+                      </svg>
+                    </div>
+                    <p className="font-sans text-xs text-gray-500 uppercase tracking-wider mb-2 font-medium">Địa điểm</p>
+                    <p className="font-serif text-sm font-bold text-gray-800 leading-tight">{data.location}</p>
                   </div>
                 </motion.div>
               </div>
@@ -277,18 +294,18 @@ const GraduationCard = () => {
               className="text-center mb-10"
               variants={itemVariants}
             >
-              <p className="font-serif italic text-lg sm:text-xl text-gray-700 leading-relaxed">
+              <p className="font-serif italic text-base sm:text-lg text-gray-700 leading-relaxed">
                 "Sự hiện diện của bạn là niềm vinh dự<br className="hidden sm:block" />
                 cho gia đình chúng tôi"
               </p>
             </motion.div>
 
             <motion.div
-              className="flex flex-col sm:flex-row gap-4 justify-center"
+              className="flex flex-col gap-6"
               variants={itemVariants}
             >
               <motion.button
-                className="relative px-8 py-4 bg-gradient-to-r from-luxury-black via-gray-900 to-luxury-black rounded-full font-sans font-semibold text-base shadow-xl overflow-hidden group"
+                className="relative px-8 py-4 bg-gradient-to-r from-luxury-black via-gray-900 to-luxury-black rounded-full font-sans font-semibold text-sm md:text-base shadow-xl overflow-hidden group mx-auto"
                 style={{
                   boxShadow: '0 10px 30px rgba(0, 0, 0, 0.3), 0 0 20px rgba(212, 175, 55, 0.3)',
                 }}
@@ -302,20 +319,68 @@ const GraduationCard = () => {
                   transition={{ duration: 0.3 }}
                 />
               </motion.button>
-              
-              <motion.button
-                className="px-8 py-4 border-2 border-luxury-black text-luxury-black rounded-full font-sans font-semibold text-base bg-white hover:bg-luxury-black hover:text-white transition-all duration-300 shadow-lg"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={() => {
-                  const startDate = new Date('2026-01-09T09:00:00')
-                  const endDate = new Date('2026-01-09T11:00:00')
-                  const googleCalendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=Lễ Tốt Nghiệp - ${encodeURIComponent(data.studentName)}&dates=${startDate.toISOString().replace(/[-:]/g, '').split('.')[0]}/${endDate.toISOString().replace(/[-:]/g, '').split('.')[0]}&details=${encodeURIComponent(data.major)}&location=${encodeURIComponent(data.location)}`
-                  window.open(googleCalendarUrl, '_blank')
-                }}
+
+              {/* Thông tin liên hệ */}
+              <motion.div
+                className="bg-gradient-to-br from-gold-50 to-white p-6 md:p-8 rounded-2xl border border-gold-200 shadow-lg"
+                variants={itemVariants}
               >
-                📅 Lưu vào Google Calendar
-              </motion.button>
+                <h3 className="text-xl md:text-2xl font-serif font-bold text-center mb-6 text-gray-800">
+                  Thông Tin Liên Hệ
+                </h3>
+                
+                <div className="flex flex-col md:flex-row gap-6 md:gap-8 items-center justify-center">
+                  {/* QR Code Zalo */}
+                  <motion.div
+                    className="flex flex-col items-center"
+                    whileHover={{ scale: 1.05 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <div className="bg-white p-4 rounded-xl shadow-md border-2 border-gold-300 mb-3">
+                      <QRCodeSVG
+                        value="https://zalo.me/0352377758"
+                        size={140}
+                        level="H"
+                        includeMargin={false}
+                        fgColor="#1a1a1a"
+                        bgColor="#ffffff"
+                      />
+                    </div>
+                    <p className="text-sm font-sans font-semibold text-gray-700">Quét để liên hệ Zalo</p>
+                  </motion.div>
+
+                  {/* Thông tin liên hệ */}
+                  <div className="flex-1 space-y-4 text-center md:text-left">
+                    <motion.a
+                      href="tel:0352377758"
+                      className="flex items-center justify-center md:justify-start gap-3 text-gray-800 hover:text-gold-600 transition-colors group"
+                      whileHover={{ x: 5 }}
+                    >
+                      <div className="w-10 h-10 rounded-full bg-gold-100 flex items-center justify-center group-hover:bg-gold-200 transition-colors">
+                        <span className="text-xl">📞</span>
+                      </div>
+                      <div>
+                        <p className="text-xs font-sans text-gray-500 uppercase tracking-wider">Số điện thoại</p>
+                        <p className="text-base md:text-lg font-sans font-semibold">0352377758</p>
+                      </div>
+                    </motion.a>
+
+                    <motion.a
+                      href="mailto:phongkcr25251313@gmail.com"
+                      className="flex items-center justify-center md:justify-start gap-3 text-gray-800 hover:text-gold-600 transition-colors group"
+                      whileHover={{ x: 5 }}
+                    >
+                      <div className="w-10 h-10 rounded-full bg-gold-100 flex items-center justify-center group-hover:bg-gold-200 transition-colors">
+                        <span className="text-xl">✉️</span>
+                      </div>
+                      <div>
+                        <p className="text-xs font-sans text-gray-500 uppercase tracking-wider">Email</p>
+                        <p className="text-sm md:text-base font-sans font-semibold break-all">phongkcr25251313@gmail.com</p>
+                      </div>
+                    </motion.a>
+                  </div>
+                </div>
+              </motion.div>
             </motion.div>
           </div>
         </motion.div>

@@ -1,4 +1,3 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import Background from './components/Background'
 import GraduationCard from './components/GraduationCard'
@@ -16,7 +15,6 @@ function HeroSection() {
     </section>
   )
 }
-
 
 function LandingPage() {
   const data = useGraduationData()
@@ -102,13 +100,7 @@ function LandingPage() {
 }
 
 function App() {
-  return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<LandingPage />} />
-      </Routes>
-    </Router>
-  )
+  return <LandingPage />
 }
 
 export default App
