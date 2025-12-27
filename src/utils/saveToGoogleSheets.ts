@@ -25,14 +25,13 @@ export async function saveToGoogleSheets(
     // Get script URL from:
     // 1. Provided parameter (highest priority)
     // 2. Environment variable VITE_GOOGLE_SCRIPT_URL
-    // 3. Hardcoded fallback (uncomment and add your URL here if needed)
-    const HARDCODED_URL = 'https://script.google.com/macros/s/AKfycbyFVfESOQ_i40e6c8P0eeI3otacY7WyNaKsiUc4VWLacDeGHkG3bT115EeCq809_fCc/exec'
     const envUrl = import.meta.env.VITE_GOOGLE_SCRIPT_URL
-    const url = scriptUrl || envUrl || HARDCODED_URL
+    const url = scriptUrl || envUrl
 
-    // Debug log
-    console.log('Environment URL:', envUrl)
-    console.log('Using URL:', url)
+    // Debug log (only log if URL exists, don't expose it)
+    if (envUrl) {
+      console.log('Environment URL configured')
+    }
 
     if (!url) {
       console.error('Google Script URL not configured')
