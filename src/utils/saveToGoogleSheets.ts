@@ -56,7 +56,7 @@ export async function saveToGoogleSheets(
     }
 
     // Send data to Google Apps Script
-    const response = await fetch(url, {
+    await fetch(url, {
       method: 'POST',
       mode: 'no-cors', // Required for Google Apps Script
       headers: {

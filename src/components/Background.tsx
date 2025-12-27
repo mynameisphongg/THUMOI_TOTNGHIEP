@@ -59,6 +59,7 @@ const Background = () => {
             height: `${element.size}px`,
             background: 'radial-gradient(circle, rgba(212, 175, 55, 0.4) 0%, rgba(255, 215, 0, 0.2) 30%, transparent 70%)',
             filter: 'blur(40px)',
+            willChange: 'transform',
           }}
           animate={{
             x: [0, Math.sin(element.id) * 100, 0],
@@ -70,9 +71,6 @@ const Background = () => {
             repeat: Infinity,
             delay: element.delay,
             ease: 'easeInOut',
-          }}
-          style={{
-            willChange: 'transform',
           }}
         />
       ))}
@@ -101,6 +99,7 @@ const Background = () => {
             height: `${particle.size}px`,
             background: 'radial-gradient(circle, rgba(212, 175, 55, 0.9) 0%, rgba(255, 215, 0, 0.6) 40%, transparent 70%)',
             boxShadow: '0 0 15px rgba(212, 175, 55, 0.8), 0 0 30px rgba(255, 215, 0, 0.4)',
+            willChange: 'transform, opacity',
           }}
           animate={{
             y: [0, -40, 0],
@@ -113,9 +112,6 @@ const Background = () => {
             repeat: Infinity,
             delay: particle.delay,
             ease: 'easeInOut',
-          }}
-          style={{
-            willChange: 'transform, opacity',
           }}
         />
       ))}
