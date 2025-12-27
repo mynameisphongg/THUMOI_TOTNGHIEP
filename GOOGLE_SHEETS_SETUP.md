@@ -5,84 +5,11 @@ Hướng dẫn này sẽ giúp bạn thiết lập Google Apps Script để lưu
 ## 🎯 Bước 1: Tạo Google Apps Script
 
 1. **Mở Google Sheets** của bạn:
-   - Truy cập: https://docs.google.com/spreadsheets/d/16dBJNWzw93JF9pWCBPJK469Y48b8KYgBrElrAYVf_EU/edit
+   - Truy cập: https://docs.google.com/
 
 2. **Tạo Script mới**:
    - Vào menu `Extensions` → `Apps Script`
-   - Xóa code mặc định và dán code sau:
-
-```javascript
-function doPost(e) {
-  try {
-    // Lấy dữ liệu từ request
-    const data = JSON.parse(e.postData.contents);
-    
-    // Mở spreadsheet (thay SPREADSHEET_ID bằng ID của sheet của bạn)
-    const SPREADSHEET_ID = '16dBJNWzw93JF9pWCBPJK469Y48b8KYgBrElrAYVf_EU';
-    const sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getActiveSheet();
-    
-    // Kiểm tra xem header đã có chưa
-    const headerRow = sheet.getRange(1, 1, 1, 5).getValues()[0];
-    if (!headerRow[0] || headerRow[0] === '') {
-      // Thêm header nếu chưa có
-      sheet.getRange(1, 1, 1, 5).setValues([['Họ và tên', 'Số điện thoại', 'Số lượng khách', 'Lời nhắn', 'Thời gian']]);
-    }
-    
-    // Thêm dữ liệu mới vào sheet
-    const newRow = [
-      data.name || '',
-      data.phone || '',
-      data.guests || 1,
-      data.message || '',
-      data.timestamp || new Date().toLocaleString('vi-VN')
-    ];
-    
-    sheet.appendRow(newRow);
-    
-    // Trả về response thành công
-    return ContentService.createTextOutput(JSON.stringify({
-      success: true,
-      message: 'Data saved successfully'
-    })).setMimeType(ContentService.MimeType.JSON);
-    
-  } catch (error) {
-    // Trả về lỗi nếu có
-    return ContentService.createTextOutput(JSON.stringify({
-      success: false,
-      error: error.toString()
-    })).setMimeType(ContentService.MimeType.JSON);
-  }
-}
-
-// Hàm này dùng cho GET request (backup method)
-function doGet(e) {
-  try {
-    const SPREADSHEET_ID = '16dBJNWzw93JF9pWCBPJK469Y48b8KYgBrElrAYVf_EU';
-    const sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getActiveSheet();
-    
-    // Kiểm tra header
-    const headerRow = sheet.getRange(1, 1, 1, 5).getValues()[0];
-    if (!headerRow[0] || headerRow[0] === '') {
-      sheet.getRange(1, 1, 1, 5).setValues([['Họ và tên', 'Số điện thoại', 'Số lượng khách', 'Lời nhắn', 'Thời gian']]);
-    }
-    
-    // Lấy dữ liệu từ query parameters
-    const name = e.parameter.name || '';
-    const phone = e.parameter.phone || '';
-    const guests = e.parameter.guests || '1';
-    const message = e.parameter.message || '';
-    const timestamp = e.parameter.timestamp || new Date().toLocaleString('vi-VN');
-    
-    // Thêm dữ liệu
-    sheet.appendRow([name, phone, guests, message, timestamp]);
-    
-    return ContentService.createTextOutput('OK').setMimeType(ContentService.MimeType.TEXT);
-    
-  } catch (error) {
-    return ContentService.createTextOutput('Error: ' + error.toString()).setMimeType(ContentService.MimeType.TEXT);
-  }
-}
-```
+   - Xóa code mặc định và dán code tương ứng
 
 3. **Lưu project**:
    - Nhấn `Ctrl+S` hoặc `Cmd+S`
@@ -111,7 +38,7 @@ function doGet(e) {
 
 4. **Copy Web App URL**:
    - Sau khi xác nhận quyền, bạn sẽ nhận được một URL
-   - Copy URL này (ví dụ: `https://script.google.com/macros/s/AKfycby.../exec`)
+   - Copy URL này
    - **Lưu ý**: URL này sẽ thay đổi mỗi khi bạn tạo deployment mới
 
 ## ⚙️ Bước 3: Cấu Hình Trong Project
