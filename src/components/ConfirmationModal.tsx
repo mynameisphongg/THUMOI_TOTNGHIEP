@@ -172,9 +172,9 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm }: ConfirmationModalProp
                           </div>
                           <div>
                             <h2 className="text-2xl md:text-3xl font-serif font-bold text-rose-900">
-                              Xác nhận tham dự
+                              Xác nhận tham dự Buổi Lễ Tốt Nghiệp Của Ngọc Phong Nhé!
                             </h2>
-                            <p className="text-rose-700 text-sm mt-1 font-sans">Vui lòng điền thông tin</p>
+                            <p className="text-rose-700 text-sm mt-1 font-sans">Vui lòng điền thông tin của bạn vào đây</p>
                           </div>
                         </div>
 
@@ -224,7 +224,7 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm }: ConfirmationModalProp
 
                           <div>
                             <label className="block text-sm font-bold text-rose-800 mb-2">
-                              Số lượng khách mời
+                              Bạn Đi Cùng Bao Nhiêu Người?
                             </label>
                             <input
                               type="number"
@@ -248,14 +248,14 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm }: ConfirmationModalProp
                       >
                         <div className="mb-5">
                           <label className="block text-sm font-bold text-rose-800 mb-2">
-                            Lời nhắn <span className="text-rose-500 text-xs font-normal">(tùy chọn)</span>
+                            Lời Chúc Mừng Gửi Đến Ngọc Phong<span className="text-rose-500 text-xs font-normal"></span>
                           </label>
                           <textarea
                             value={formData.message}
                             onChange={(e) => setFormData(prev => ({ ...prev, message: e.target.value }))}
                             rows={6}
                             className="w-full px-4 py-3 border-2 border-rose-200 rounded-xl focus:border-rose-400 focus:outline-none focus:ring-2 focus:ring-rose-200 transition-all resize-none text-gray-900 placeholder-gray-400 bg-white/90 text-base font-sans"
-                            placeholder="Gửi lời chúc mừng đến sinh viên..."
+                            placeholder="Gửi lời chúc mừng đến Ngọc Phong..."
                           />
                         </div>
 

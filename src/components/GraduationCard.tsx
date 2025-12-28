@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import { QRCodeSVG } from 'qrcode.react'
 import { useGraduationData } from '../hooks/useGraduationData'
 import ConfirmationModal from './ConfirmationModal'
+import ParticleSparkles from './ParticleSparkles'
 
 const containerVariants: Variants = {
   hidden: { opacity: 0, y: 50, scale: 0.95 },
@@ -97,9 +98,51 @@ const GraduationCard = () => {
   const data = useGraduationData()
   const [showConfetti, setShowConfetti] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [countdown, setCountdown] = useState<{
+    days: number
+    hours: number
+    minutes: number
+    seconds: number
+  } | null>(null)
+  const [sparkles, setSparkles] = useState<Array<{ id: number; x: number; y: number }>>([])
 
-  const handleConfirm = () => {
+  // Countdown timer
+  useEffect(() => {
+    const targetDate = new Date('2026-01-09T09:00:00').getTime()
+
+    const updateCountdown = () => {
+      const now = new Date().getTime()
+      const distance = targetDate - now
+
+      if (distance > 0) {
+        setCountdown({
+          days: Math.floor(distance / (1000 * 60 * 60 * 24)),
+          hours: Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
+          minutes: Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60)),
+          seconds: Math.floor((distance % (1000 * 60)) / 1000),
+        })
+      } else {
+        setCountdown(null)
+      }
+    }
+
+    updateCountdown()
+    const interval = setInterval(updateCountdown, 1000)
+
+    return () => clearInterval(interval)
+  }, [])
+
+  const handleConfirm = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect()
+    const x = rect.left + rect.width / 2
+    const y = rect.top + rect.height / 2
+    
+    setSparkles([...sparkles, { id: Date.now(), x, y }])
     setIsModalOpen(true)
+  }
+
+  const removeSparkle = (id: number) => {
+    setSparkles(sparkles.filter(s => s.id !== id))
   }
 
   const handleModalConfirm = (formData: { name: string; phone: string; guests: number; message: string }) => {
@@ -111,6 +154,14 @@ const GraduationCard = () => {
   return (
     <>
       {showConfetti && <Confetti />}
+      {sparkles.map((sparkle) => (
+        <ParticleSparkles
+          key={sparkle.id}
+          x={sparkle.x}
+          y={sparkle.y}
+          onComplete={() => removeSparkle(sparkle.id)}
+        />
+      ))}
       <ConfirmationModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
@@ -166,10 +217,8 @@ const GraduationCard = () => {
               <motion.h1
                 className="text-3xl sm:text-4xl md:text-5xl font-serif font-bold mb-6"
                 style={{
-                  background: 'linear-gradient(135deg, #1a1a1a 0%, #d4af37 50%, #1a1a1a 100%)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  backgroundClip: 'text',
+                  color: '#d4af37',
+                  textShadow: '2px 2px 8px rgba(0, 0, 0, 0.3), 0 0 20px rgba(212, 175, 55, 0.4)',
                 }}
                 variants={itemVariants}
               >
@@ -235,12 +284,23 @@ const GraduationCard = () => {
             >
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <motion.div 
-                  className="bg-gradient-to-br from-gold-50 to-white p-6 rounded-2xl border border-gold-100 shadow-lg"
-                  whileHover={{ scale: 1.02, y: -2 }}
+                  className="bg-gradient-to-br from-gold-50 to-white p-6 rounded-2xl border border-gold-100 shadow-lg relative overflow-hidden group"
+                  whileHover={{ 
+                    scale: 1.05, 
+                    y: -4,
+                    boxShadow: '0 20px 40px rgba(212, 175, 55, 0.3), 0 0 30px rgba(255, 215, 0, 0.2)',
+                  }}
                   variants={itemVariants}
                 >
-                  <div className="flex flex-col items-center text-center">
-                    <div className="text-4xl mb-3">📅</div>
+                  <div className="absolute inset-0 bg-gradient-to-br from-gold-200/0 to-gold-200/0 group-hover:from-gold-200/20 group-hover:to-gold-200/10 transition-all duration-300" />
+                  <div className="relative flex flex-col items-center text-center">
+                    <motion.div 
+                      className="text-4xl mb-3"
+                      whileHover={{ rotate: [0, -10, 10, -10, 0], scale: 1.2 }}
+                      transition={{ duration: 0.5 }}
+                    >
+                      📅
+                    </motion.div>
                     <p className="font-sans text-xs text-gray-500 uppercase tracking-wider mb-2 font-medium">Ngày</p>
                     <p className="font-serif text-base font-bold text-gray-800">{data.date.split(',')[0]}</p>
                     <p className="font-serif text-sm text-gray-700 font-normal">{data.date.split(',')[1]}</p>
@@ -253,19 +313,53 @@ const GraduationCard = () => {
                   variants={itemVariants}
                 >
                   <div className="flex flex-col items-center text-center">
-                    <div className="text-4xl mb-3">🕐</div>
+                    <motion.div 
+                      className="text-4xl mb-3"
+                      whileHover={{ rotate: [0, -10, 10, -10, 0], scale: 1.2 }}
+                      transition={{ duration: 0.5 }}
+                    >
+                      🕐
+                    </motion.div>
                     <p className="font-sans text-xs text-gray-500 uppercase tracking-wider mb-2 font-medium">Thời gian</p>
-                    <p className="font-serif text-xl font-bold text-gray-800">{data.time}</p>
+                    <p className="font-serif text-xl font-bold text-gray-800 mb-2">{data.time}</p>
+                    {countdown && (
+                      <div className="mt-1.5 pt-1.5 border-t border-gold-200/50 w-full">
+                        <p className="font-sans text-[9px] text-gray-400 uppercase tracking-wide mb-0.5">Còn lại</p>
+                        <div className="flex items-center justify-center gap-0.5 text-[10px]">
+                          {countdown.days > 0 && (
+                            <span className="font-sans font-semibold text-gray-600">
+                              {countdown.days} ngày
+                            </span>
+                          )}
+                          <span className="font-sans font-semibold text-gray-600">
+                            {String(countdown.hours).padStart(2, '0')}:
+                            {String(countdown.minutes).padStart(2, '0')}:
+                            {String(countdown.seconds).padStart(2, '0')}
+                          </span>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </motion.div>
                 
                 <motion.div 
-                  className="bg-gradient-to-br from-gold-50 to-white p-6 rounded-2xl border border-gold-100 shadow-lg md:col-span-1"
-                  whileHover={{ scale: 1.02, y: -2 }}
+                  className="bg-gradient-to-br from-gold-50 to-white p-6 rounded-2xl border border-gold-100 shadow-lg md:col-span-1 cursor-pointer relative overflow-hidden group"
+                  whileHover={{ 
+                    scale: 1.08, 
+                    y: -6,
+                    boxShadow: '0 25px 50px rgba(212, 175, 55, 0.4), 0 0 40px rgba(255, 215, 0, 0.3)',
+                  }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => window.open('https://maps.app.goo.gl/BKTGw1v2kQsA6QZj6', '_blank')}
                   variants={itemVariants}
                 >
-                  <div className="flex flex-col items-center text-center">
-                    <div className="mb-3 flex items-center justify-center">
+                  <div className="absolute inset-0 bg-gradient-to-br from-gold-200/0 to-gold-200/0 group-hover:from-gold-200/30 group-hover:to-gold-200/15 transition-all duration-300" />
+                  <div className="relative flex flex-col items-center text-center">
+                    <motion.div 
+                      className="mb-3 flex items-center justify-center"
+                      whileHover={{ scale: 1.2, rotate: [0, -5, 5, -5, 0] }}
+                      transition={{ duration: 0.5 }}
+                    >
                       <svg 
                         width="48" 
                         height="48" 
@@ -279,9 +373,18 @@ const GraduationCard = () => {
                           fill="#EA4335"
                         />
                       </svg>
-                    </div>
+                    </motion.div>
                     <p className="font-sans text-xs text-gray-500 uppercase tracking-wider mb-2 font-medium">Địa điểm</p>
-                    <p className="font-serif text-sm font-bold text-gray-800 leading-tight">{data.location}</p>
+                    <p className="font-serif text-sm font-bold text-gray-800 leading-tight group-hover:text-gold-600 transition-colors">
+                      {data.location}
+                    </p>
+                    <motion.p 
+                      className="font-sans text-xs text-gold-600 mt-2 opacity-75"
+                      animate={{ opacity: [0.75, 1, 0.75] }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                    >
+                      👆 Nhấn để xem bản đồ
+                    </motion.p>
                   </div>
                 </motion.div>
               </div>
@@ -293,7 +396,7 @@ const GraduationCard = () => {
               className="text-center mb-10"
               variants={itemVariants}
             >
-              <p className="font-serif italic text-base sm:text-lg text-gray-700 leading-relaxed">
+                    <p className="font-serif italic text-base sm:text-lg text-gray-700 leading-relaxed">
                 "Sự hiện diện của bạn là niềm vinh dự<br className="hidden sm:block" />
                 cho gia đình chúng tôi"
               </p>
@@ -308,11 +411,20 @@ const GraduationCard = () => {
                 style={{
                   boxShadow: '0 10px 30px rgba(0, 0, 0, 0.3), 0 0 20px rgba(212, 175, 55, 0.3)',
                 }}
-                whileHover={{ scale: 1.05, boxShadow: '0 15px 40px rgba(0, 0, 0, 0.4), 0 0 30px rgba(212, 175, 55, 0.5)' }}
+                whileHover={{ 
+                  scale: 1.05, 
+                  boxShadow: '0 15px 40px rgba(0, 0, 0, 0.4), 0 0 30px rgba(212, 175, 55, 0.5)',
+                }}
                 whileTap={{ scale: 0.98 }}
                 onClick={handleConfirm}
+                onMouseEnter={(e) => {
+                  const rect = e.currentTarget.getBoundingClientRect()
+                  const x = rect.left + rect.width / 2
+                  const y = rect.top + rect.height / 2
+                  setSparkles([...sparkles, { id: Date.now(), x, y }])
+                }}
               >
-                <span className="relative z-10 text-white">Xác nhận tham dự</span>
+                <span className="relative z-10 text-white">Xác nhận tham dự thì nhấn vào đây nhé!</span>
                 <motion.div
                   className="absolute inset-0 bg-gradient-to-r from-gold-600 to-gold-500 opacity-0 group-hover:opacity-100"
                   transition={{ duration: 0.3 }}
@@ -337,7 +449,7 @@ const GraduationCard = () => {
                   >
                     <div className="bg-white p-4 rounded-xl shadow-md border-2 border-gold-300 mb-3">
                       <QRCodeSVG
-                        value="https://zalo.me/0352377758"
+                        value="https://zalo.me/p/0352377758"
                         size={140}
                         level="H"
                         includeMargin={false}
@@ -345,7 +457,7 @@ const GraduationCard = () => {
                         bgColor="#ffffff"
                       />
                     </div>
-                    <p className="text-sm font-sans font-semibold text-gray-700">Quét để liên hệ Zalo</p>
+                    <p className="text-sm font-sans font-semibold text-gray-700">Quét để xem trang cá nhân Zalo</p>
                   </motion.div>
 
                   {/* Thông tin liên hệ */}
