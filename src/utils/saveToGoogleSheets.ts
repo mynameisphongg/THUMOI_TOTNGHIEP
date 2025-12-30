@@ -11,6 +11,9 @@ export interface FormData {
   timestamp?: string
 }
 
+// KHÔNG hardcode URL ở đây để tránh lộ thông tin khi push lên Git
+// URL phải được cấu hình qua biến môi trường VITE_GOOGLE_SCRIPT_URL
+
 /**
  * Saves form data to Google Sheets via Google Apps Script Web App
  * @param data - Form data to save
@@ -25,19 +28,48 @@ export async function saveToGoogleSheets(
     // Get script URL from:
     // 1. Provided parameter (highest priority)
     // 2. Environment variable VITE_GOOGLE_SCRIPT_URL
+    // KHÔNG có fallback để tránh lộ URL trong code
     const envUrl = import.meta.env.VITE_GOOGLE_SCRIPT_URL
-    const url = scriptUrl || envUrl
+    let url = scriptUrl || envUrl
 
-    // Debug log (only log if URL exists, don't expose it)
+    // Debug logging
+    console.log('Checking Google Script URL configuration...')
+    console.log('import.meta.env keys:', Object.keys(import.meta.env))
+    console.log('VITE_GOOGLE_SCRIPT_URL value:', envUrl || 'undefined')
+    
     if (envUrl) {
-      console.log('Environment URL configured')
+      console.log('✅ Environment URL found:', envUrl.substring(0, 50) + '...')
+    } else {
+      console.warn('⚠️ VITE_GOOGLE_SCRIPT_URL not found in environment variables')
+      console.warn('💡 Hãy đảm bảo:')
+      console.warn('   1. File .env tồn tại trong thư mục gốc của project')
+      console.warn('   2. File .env có dòng: VITE_GOOGLE_SCRIPT_URL=https://...')
+      console.warn('   3. Dev server đã được RESTART sau khi tạo/sửa file .env')
+      console.warn('   4. Không có khoảng trắng thừa trong file .env')
     }
 
+    // Trim whitespace from URL if it exists
+    if (url) {
+      url = url.trim()
+    }
+
+    // Validate URL format
     if (!url) {
       console.error('Google Script URL not configured')
       return {
         success: false,
         error: 'Google Script URL chưa được cấu hình. Vui lòng xem file GOOGLE_SHEETS_SETUP.md để thiết lập.',
+      }
+    }
+
+    // Validate URL format
+    try {
+      new URL(url)
+    } catch (urlError) {
+      console.error('Invalid URL format:', url)
+      return {
+        success: false,
+        error: 'URL Google Script không hợp lệ. Vui lòng kiểm tra lại file .env',
       }
     }
 
@@ -55,25 +87,50 @@ export async function saveToGoogleSheets(
       }),
     }
 
-    // Send data to Google Apps Script
-    await fetch(url, {
-      method: 'POST',
-      mode: 'no-cors', // Required for Google Apps Script
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(dataWithTimestamp),
+    // Log the data being sent (without sensitive info)
+    console.log('Sending data to Google Sheets:', {
+      name: dataWithTimestamp.name,
+      phone: dataWithTimestamp.phone.substring(0, 3) + '***',
+      guests: dataWithTimestamp.guests,
+      hasMessage: !!dataWithTimestamp.message,
+      timestamp: dataWithTimestamp.timestamp,
     })
 
-    // Note: With no-cors mode, we can't read the response
-    // But the data should still be saved
-    // We'll assume success if no error is thrown
-    return { success: true }
+    // Send data to Google Apps Script
+    try {
+      await fetch(url, {
+        method: 'POST',
+        mode: 'no-cors', // Required for Google Apps Script
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(dataWithTimestamp),
+      })
+
+      // Note: With no-cors mode, we can't read the response
+      // But the data should still be saved
+      // We'll assume success if no error is thrown
+      console.log('Request sent successfully (no-cors mode - cannot verify response)')
+      return { success: true }
+    } catch (fetchError) {
+      console.error('Fetch error:', fetchError)
+      throw fetchError
+    }
   } catch (error) {
     console.error('Error saving to Google Sheets:', error)
+    const errorMessage = error instanceof Error ? error.message : 'Có lỗi xảy ra khi lưu dữ liệu'
+    
+    // Provide more helpful error messages
+    if (errorMessage.includes('Failed to fetch') || errorMessage.includes('NetworkError')) {
+      return {
+        success: false,
+        error: 'Không thể kết nối đến Google Script. Vui lòng kiểm tra kết nối internet và URL trong file .env',
+      }
+    }
+    
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Có lỗi xảy ra khi lưu dữ liệu',
+      error: errorMessage,
     }
   }
 }

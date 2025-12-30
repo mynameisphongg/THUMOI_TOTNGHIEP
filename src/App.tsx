@@ -73,7 +73,7 @@ function LandingPage() {
                       repeatDelay: 1,
                     }}
                   >
-git                    <span className="text-7xl"></span>
+                 <span className="text-7xl"></span>
                   </motion.div>
                   <h2
                     className="text-4xl md:text-5xl font-serif font-bold mb-4"
