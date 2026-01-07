@@ -13,12 +13,11 @@ interface PhotoBubble {
 
 interface FloatingPhotoBubblesProps {
   photos: string[]
-  containerRef?: React.RefObject<HTMLDivElement>
   centerX?: number // Vị trí X của ảnh avatar (phần trăm)
   centerY?: number // Vị trí Y của ảnh avatar (phần trăm)
 }
 
-const FloatingPhotoBubbles = ({ photos, containerRef, centerX = 20, centerY = 50 }: FloatingPhotoBubblesProps) => {
+const FloatingPhotoBubbles = ({ photos, centerX = 20, centerY = 50 }: FloatingPhotoBubblesProps) => {
   const [bubbles, setBubbles] = useState<PhotoBubble[]>([])
   const [isMobile, setIsMobile] = useState(false)
 

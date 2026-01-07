@@ -1,5 +1,5 @@
 import { motion, Variants } from 'framer-motion'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { QRCodeSVG } from 'qrcode.react'
 import { useGraduationData } from '../hooks/useGraduationData'
 import ConfirmationModal from './ConfirmationModal'
