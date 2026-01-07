@@ -1,9 +1,10 @@
 import { motion, Variants } from 'framer-motion'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { QRCodeSVG } from 'qrcode.react'
 import { useGraduationData } from '../hooks/useGraduationData'
 import ConfirmationModal from './ConfirmationModal'
 import ParticleSparkles from './ParticleSparkles'
+import FloatingPhotoBubbles from './FloatingPhotoBubbles'
 
 const containerVariants: Variants = {
   hidden: { opacity: 0, y: 50, scale: 0.95 },
@@ -202,11 +203,20 @@ const GraduationCard = () => {
 
           <div className="pt-12">
             <motion.div
-              className="text-center mb-10"
+              className="text-center mb-10 relative"
               variants={itemVariants}
             >
+              {/* Container cho ảnh bong bóng xung quanh phần "LỄ TỐT NGHIỆP" */}
+              <div className="absolute inset-0 z-0 overflow-visible" style={{ minHeight: '200px', top: '-50px', left: '-20px', right: '-20px' }}>
+                <FloatingPhotoBubbles
+                  photos={['/anh2.jpg', '/anh3.jpg', '/anh4.jpg', '/anhtotnghiep.jpg']}
+                  centerX={50} // Giữa màn hình (50%)
+                  centerY={25} // 25% từ trên - lên cao hơn để không che chữ
+                />
+              </div>
+
               <motion.div
-                className="inline-block mb-4 px-6 py-2 bg-gradient-to-r from-gold-100 to-gold-50 rounded-full border border-gold-200"
+                className="inline-block mb-4 px-6 py-2 bg-gradient-to-r from-gold-100 to-gold-50 rounded-full border border-gold-200 relative z-10"
                 variants={itemVariants}
               >
                 <p className="text-xs sm:text-sm font-sans font-semibold text-gold-700 tracking-widest uppercase">
@@ -215,7 +225,7 @@ const GraduationCard = () => {
               </motion.div>
               
               <motion.h1
-                className="text-3xl sm:text-4xl md:text-5xl font-serif font-bold mb-6"
+                className="text-3xl sm:text-4xl md:text-5xl font-serif font-bold mb-6 relative z-10"
                 style={{
                   color: '#d4af37',
                   textShadow: '2px 2px 8px rgba(0, 0, 0, 0.3), 0 0 20px rgba(212, 175, 55, 0.4)',
@@ -228,26 +238,101 @@ const GraduationCard = () => {
               <DecorativeDivider />
             </motion.div>
 
-            <div className="flex flex-col md:flex-row gap-8 md:gap-12 items-center mb-10">
+            <div className="flex flex-col md:flex-row gap-8 md:gap-12 items-center mb-10 relative">
+
               <motion.div
-                className="flex-shrink-0 relative"
+                className="flex-shrink-0 relative z-10"
                 variants={itemVariants}
               >
-                <div className="absolute inset-0 bg-gradient-to-br from-gold-400 to-gold-600 rounded-full blur-xl opacity-50 animate-pulse" />
+                {/* Glow effect cho ảnh chính */}
+                <div className="absolute inset-0 bg-gradient-to-br from-gold-400 via-gold-500 to-gold-600 rounded-full blur-2xl opacity-60 animate-pulse" 
+                  style={{ transform: 'scale(1.3)' }}
+                />
+                <div className="absolute inset-0 bg-gradient-to-br from-gold-300 to-gold-500 rounded-full blur-xl opacity-40" 
+                  style={{ transform: 'scale(1.1)' }}
+                />
+                
+                {/* Ảnh chính - đã thay bằng anh1.jpg */}
                 <motion.img
-                  src="/image.jpg"
+                  src="/anh1.jpg"
                   alt={data.studentName}
                   className="relative w-40 h-40 sm:w-48 sm:h-48 md:w-56 md:h-56 rounded-full object-cover border-4 border-gold-500 shadow-2xl"
                   style={{
-                    boxShadow: '0 0 40px rgba(212, 175, 55, 0.6), inset 0 0 40px rgba(255, 255, 255, 0.2)',
+                    boxShadow: `
+                      0 0 50px rgba(212, 175, 55, 0.8),
+                      0 0 80px rgba(255, 215, 0, 0.5),
+                      inset 0 0 50px rgba(255, 255, 255, 0.2)
+                    `,
                   }}
                   onError={(e) => {
                     const target = e.target as HTMLImageElement
-                    target.style.display = 'none'
+                    // Fallback về các ảnh khác nếu anh1.jpg không tồn tại
+                    if (target.src.includes('anh1')) {
+                      target.src = '/anhtotnghiep.jpg'
+                    } else if (target.src.includes('anhtotnghiep')) {
+                      target.src = '/image.jpg'
+                    } else {
+                      target.style.display = 'none'
+                    }
                   }}
-                  whileHover={{ scale: 1.05, rotate: 2 }}
-                  transition={{ type: 'spring', stiffness: 300 }}
+                  whileHover={{ 
+                    scale: 1.1, 
+                    rotate: 5,
+                    boxShadow: `
+                      0 0 60px rgba(212, 175, 55, 1),
+                      0 0 100px rgba(255, 215, 0, 0.7),
+                      inset 0 0 60px rgba(255, 255, 255, 0.3)
+                    `,
+                  }}
+                  animate={{
+                    y: [0, -10, 0],
+                  }}
+                  transition={{
+                    type: 'spring',
+                    stiffness: 300,
+                    damping: 20,
+                    y: {
+                      duration: 3,
+                      repeat: Infinity,
+                      ease: 'easeInOut',
+                    },
+                  }}
                 />
+                
+                {/* Sparkle effects xung quanh ảnh chính */}
+                {[...Array(6)].map((_, i) => (
+                  <motion.div
+                    key={i}
+                    className="absolute rounded-full bg-gold-400"
+                    style={{
+                      width: '6px',
+                      height: '6px',
+                      left: '50%',
+                      top: '50%',
+                      transformOrigin: 'center',
+                    }}
+                    animate={{
+                      x: [
+                        Math.cos((i / 6) * Math.PI * 2) * 80,
+                        Math.cos((i / 6) * Math.PI * 2) * 100,
+                        Math.cos((i / 6) * Math.PI * 2) * 80,
+                      ],
+                      y: [
+                        Math.sin((i / 6) * Math.PI * 2) * 80,
+                        Math.sin((i / 6) * Math.PI * 2) * 100,
+                        Math.sin((i / 6) * Math.PI * 2) * 80,
+                      ],
+                      opacity: [0, 1, 0],
+                      scale: [0, 1, 0],
+                    }}
+                    transition={{
+                      duration: 2,
+                      repeat: Infinity,
+                      delay: i * 0.3,
+                      ease: 'easeInOut',
+                    }}
+                  />
+                ))}
               </motion.div>
               
               <motion.div className="text-center md:text-left flex-1" variants={itemVariants}>
