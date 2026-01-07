@@ -20,6 +20,8 @@ interface FloatingPhotoBubblesProps {
 const FloatingPhotoBubbles = ({ photos, centerX = 20, centerY = 50 }: FloatingPhotoBubblesProps) => {
   const [bubbles, setBubbles] = useState<PhotoBubble[]>([])
   const [isMobile, setIsMobile] = useState(false)
+  const [loadedIds, setLoadedIds] = useState<Set<number>>(new Set())
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
 
   useEffect(() => {
     // Kiểm tra kích thước màn hình
@@ -28,7 +30,19 @@ const FloatingPhotoBubbles = ({ photos, centerX = 20, centerY = 50 }: FloatingPh
     }
     checkMobile()
     window.addEventListener('resize', checkMobile)
-    return () => window.removeEventListener('resize', checkMobile)
+
+    // Detect prefers-reduced-motion
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)')
+    const handleReduced = () => setPrefersReducedMotion(mq.matches)
+    handleReduced()
+    if (mq.addEventListener) mq.addEventListener('change', handleReduced)
+    else mq.addListener(handleReduced)
+
+    return () => {
+      window.removeEventListener('resize', checkMobile)
+      if (mq.removeEventListener) mq.removeEventListener('change', handleReduced)
+      else mq.removeListener(handleReduced)
+    }
   }, [])
 
 
@@ -39,14 +53,16 @@ const FloatingPhotoBubbles = ({ photos, centerX = 20, centerY = 50 }: FloatingPh
     const adjustedCenterX = centerX // Sử dụng centerX được truyền vào
     const adjustedCenterY = centerY
 
-    const newBubbles: PhotoBubble[] = photos.map((photo, index) => {
-      // Đặt 4 ảnh ở 4 góc rõ ràng, rời rạc nhau với khoảng cách lớn
-      // Sử dụng vị trí cố định ở các góc xa nhất để đảm bảo không dính nhau
+    // Trên mobile chỉ dùng tối đa 2 ảnh để giảm tải
+    const photoSources = isMobile ? photos.slice(0, 2) : photos
+
+    const newBubbles: PhotoBubble[] = photoSources.map((photo, index) => {
+      // Đặt ảnh ở các vị trí cố định để giảm tính toán động
       const positions = [
-        { x: 5, y: 8 },    // Góc trên trái - xa nhất có thể
-        { x: 85, y: 10 },  // Góc trên phải - giảm X để không bị cắt
-        { x: 8, y: 52 },   // Góc dưới trái - xa nhất có thể
-        { x: 82, y: 50 },  // Góc dưới phải - giảm X để không bị cắt
+        { x: 5, y: 8 },    // Góc trên trái
+        { x: 85, y: 10 },  // Góc trên phải
+        { x: 8, y: 52 },   // Góc dưới trái
+        { x: 82, y: 50 },  // Góc dưới phải
       ]
       
       const pos = positions[index] || {
@@ -59,9 +75,9 @@ const FloatingPhotoBubbles = ({ photos, centerX = 20, centerY = 50 }: FloatingPh
         src: photo,
         x: pos.x,
         y: pos.y,
-        size: isMobile ? 50 + (index % 2) * 8 : 65 + (index % 2) * 10, // Giảm kích thước một chút
-        delay: index * 0.3, // Tăng delay để tạo hiệu ứng rời rạc hơn
-        rotation: (index * 90) + Math.random() * 30 - 15, // Tăng random rotation
+        size: isMobile ? 44 + (index % 2) * 6 : 60 + (index % 2) * 8, // Kích thước nhẹ hơn
+        delay: index * 0.35, // Tăng delay để chia hiệu ứng
+        rotation: (index * 70) + Math.random() * 20 - 10,
       }
     })
 
@@ -113,7 +129,11 @@ const FloatingPhotoBubbles = ({ photos, centerX = 20, centerY = 50 }: FloatingPh
             <motion.img
               src={bubble.src}
               alt={`Photo ${bubble.id + 1}`}
-              className="relative w-full h-full rounded-full object-cover border-[3px] border-gold-400/90 shadow-2xl"
+              loading="lazy"
+              decoding="async"
+              width={bubble.size}
+              height={bubble.size}
+              className={`relative w-full h-full rounded-full object-cover border-[3px] border-gold-400/90 shadow-2xl ${!loadedIds.has(bubble.id) ? 'bg-gray-100 animate-pulse' : ''}`}
               style={{
                 boxShadow: `
                   0 0 25px rgba(212, 175, 55, 0.9),
@@ -122,15 +142,16 @@ const FloatingPhotoBubbles = ({ photos, centerX = 20, centerY = 50 }: FloatingPh
                 `,
               }}
               whileHover={{
-                scale: 1.4,
+                scale: prefersReducedMotion ? 1 : 1.25,
                 zIndex: 50,
-                boxShadow: `
-                  0 0 45px rgba(212, 175, 55, 1),
-                  0 0 90px rgba(255, 215, 0, 0.9),
-                  inset 0 0 45px rgba(255, 255, 255, 0.35)
-                `,
               }}
-              transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+              animate={prefersReducedMotion ? undefined : {
+                opacity: [0.85, 1, 1, 0.95],
+                scale: [0.95, 1.02, 1, 1.01],
+                rotate: [bubble.rotation, bubble.rotation + 8, bubble.rotation - 6, bubble.rotation],
+              }}
+              transition={{ duration: 6 + bubble.id * 0.3, repeat: Infinity, delay: bubble.delay, ease: 'easeInOut' }}
+              onLoad={() => setLoadedIds((prev) => new Set(prev).add(bubble.id))}
               onError={(e) => {
                 const target = e.target as HTMLImageElement
                 target.style.display = 'none'

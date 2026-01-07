@@ -106,6 +106,7 @@ const GraduationCard = () => {
     seconds: number
   } | null>(null)
   const [sparkles, setSparkles] = useState<Array<{ id: number; x: number; y: number }>>([])
+  const [mainLoaded, setMainLoaded] = useState<boolean>(false)
 
   // Countdown timer
   useEffect(() => {
@@ -256,7 +257,11 @@ const GraduationCard = () => {
                 <motion.img
                   src="/anh1.jpg"
                   alt={data.studentName}
-                  className="relative w-40 h-40 sm:w-48 sm:h-48 md:w-56 md:h-56 rounded-full object-cover border-4 border-gold-500 shadow-2xl"
+                  loading={mainLoaded ? 'lazy' : 'eager'}
+                  decoding="async"
+                  width={224}
+                  height={224}
+                  className={`relative w-40 h-40 sm:w-48 sm:h-48 md:w-56 md:h-56 rounded-full object-cover border-4 border-gold-500 shadow-2xl ${!mainLoaded ? 'bg-gray-100 animate-pulse' : ''}`}
                   style={{
                     boxShadow: `
                       0 0 50px rgba(212, 175, 55, 0.8),
@@ -264,6 +269,7 @@ const GraduationCard = () => {
                       inset 0 0 50px rgba(255, 255, 255, 0.2)
                     `,
                   }}
+                  onLoad={() => setMainLoaded(true)}
                   onError={(e) => {
                     const target = e.target as HTMLImageElement
                     // Fallback về các ảnh khác nếu anh1.jpg không tồn tại
@@ -276,23 +282,18 @@ const GraduationCard = () => {
                     }
                   }}
                   whileHover={{ 
-                    scale: 1.1, 
-                    rotate: 5,
-                    boxShadow: `
-                      0 0 60px rgba(212, 175, 55, 1),
-                      0 0 100px rgba(255, 215, 0, 0.7),
-                      inset 0 0 60px rgba(255, 255, 255, 0.3)
-                    `,
+                    scale: 1.07, 
+                    rotate: 3,
                   }}
                   animate={{
-                    y: [0, -10, 0],
+                    y: [0, -6, 0],
                   }}
                   transition={{
                     type: 'spring',
-                    stiffness: 300,
-                    damping: 20,
+                    stiffness: 250,
+                    damping: 22,
                     y: {
-                      duration: 3,
+                      duration: 3.5,
                       repeat: Infinity,
                       ease: 'easeInOut',
                     },
