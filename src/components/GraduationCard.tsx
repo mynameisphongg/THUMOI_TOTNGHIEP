@@ -109,7 +109,7 @@ const GraduationCard = () => {
 
   // Countdown timer
   useEffect(() => {
-    const targetDate = new Date('2026-01-09T09:00:00').getTime()
+    const targetDate = new Date('2026-01-09T10:00:00').getTime()
 
     const updateCountdown = () => {
       const now = new Date().getTime()
